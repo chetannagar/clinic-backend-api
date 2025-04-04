@@ -1,0 +1,76 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+env/
+venv/
+build/
+dist/
+eggs/
+.eggs-info/
+lib/
+lib64/
+parts/
+sdist/
+$folder/
+*.egg-info/
+.installed.txt
+*.pth
+
+# Django stuff:
+*.log
+*.pot
+*.sqlite3
+*.sqlite3-journal
+local_settings.py
+db.sqlite3
+media/
+static/
+.env
+
+# Environments
+.venv/
+env/
+venv/
+*/env/
+*/venv/
+.idea/
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Virtualenv
+/venv/
+
+# Static files
+staticfiles/
+
+# Coverage data
+.coverage
+*.coverage
+*.dat
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.tox-*
+
+# Celery stuff
+celerybeat.pid
+celeryworker.pid
+
+# Docker files
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile
+
+# Other stuff
+*.swp
+*~
+.DS_Store
