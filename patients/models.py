@@ -15,7 +15,7 @@ class Patient(models.Model):
         (GENDER_OTHER, 'Other'),
     ]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    address = models.TextField()
+    address = models.TextField(blank=True)
     emergency_contact = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

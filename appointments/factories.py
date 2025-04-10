@@ -1,6 +1,7 @@
 import factory
 import random
 import datetime
+import uuid
 from appointments.models import Appointment
 from patients.factories import PatientFactory
 from doctors.factories import DoctorFactory
@@ -8,7 +9,8 @@ from doctors.factories import DoctorFactory
 class AppointmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Appointment
-
+    
+    id = factory.LazyFunction(uuid.uuid4)
     patient = factory.SubFactory(PatientFactory)
     doctor = factory.SubFactory(DoctorFactory)
     appointment_date = factory.Faker('future_date')
@@ -23,7 +25,8 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     ])
     reason = factory.Faker('sentence')
     notes = factory.Faker('text')
-
+    # No need to define created_at and updated_at as they use auto_now_add and auto_now
+    
     @factory.post_generation
     def notes_optional(self, create, extracted, **kwargs):
         if not create:

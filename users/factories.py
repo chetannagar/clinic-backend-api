@@ -1,7 +1,7 @@
 import factory
-import random
 from users.models import User
 from faker import Faker
+import uuid
 
 fake = Faker('en_US')
 
@@ -9,7 +9,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    firebase_uid = factory.Faker('uuid4')
+    id = factory.LazyFunction(uuid.uuid4)
+    firebase_uid = factory.LazyFunction(uuid.uuid4)
     email = factory.Faker('email')
     password_hash = factory.Faker('password')  # Or leave blank/null as needed
     first_name = factory.Faker('first_name')
@@ -21,7 +22,8 @@ class UserFactory(factory.django.DjangoModelFactory):
         User.ROLE_ADMIN,
         User.ROLE_STAFF,
     ])
-    specialization = factory.LazyFunction(lambda: fake.job() if random.random() < 0.5 else None)
+    # created_at = factory.Faker('date_time_this_decade')
+    # updated_at = factory.Faker('date_time_this_decade')
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"

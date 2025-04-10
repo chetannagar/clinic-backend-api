@@ -1,38 +1,15 @@
+import uuid
 import factory
 import random
 import datetime
 from django.utils import timezone
-from clinic_settings.models import Availability, ClinicSetting, Review, AuditLog
+from clinic_settings.models import ClinicSetting, Review, AuditLog, AdminActionLog
 from doctors.factories import DoctorFactory
 from patients.factories import PatientFactory
 from users.factories import UserFactory
 from faker import Faker
 
 fake = Faker()
-
-
-class AvailabilityFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Availability
-
-    doctor = factory.SubFactory(DoctorFactory)
-    date = factory.Faker('future_date')
-
-    @staticmethod
-    def generate_time_slots():
-        slots = []
-        start_hour = random.randint(8, 10)
-        end_hour = random.randint(16, 18)
-        for hour in range(start_hour, end_hour):
-            slots.append({
-                'start': f"{hour:02d}:00",
-                'end': f"{hour + 1:02d}:00"
-            })
-        return slots
-
-    time_slots = factory.LazyFunction(generate_time_slots)
-    is_available = factory.LazyFunction(lambda: random.choice([True, False]))
-
 
 class ClinicSettingFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -82,3 +59,15 @@ class AuditLogFactory(factory.django.DjangoModelFactory):
         "Edited Availability",
     ]))
     timestamp = factory.LazyFunction(timezone.now)
+
+class AdminActionLogFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AdminActionLog
+
+    id = factory.LazyFunction(uuid.uuid4)
+    user = factory.SubFactory(UserFactory, role='Admin')  # Only Admins perform actions
+    action = factory.LazyFunction(lambda: fake.sentence(nb_words=10))  # Random short description of the action
+    created_at = factory.LazyFunction(fake.date_time_this_year)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.action}"
