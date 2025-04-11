@@ -31,4 +31,6 @@ class Prescription(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Prescription for {self.patient.name} by {self.doctor.name}"
+        patient_full_name = f"{self.patient.user.first_name} {self.patient.user.last_name}".strip()
+        doctor_full_name = f"{self.doctor.user.first_name} {self.doctor.user.last_name}".strip()
+        return f"Prescription for {patient_full_name} by {doctor_full_name}"

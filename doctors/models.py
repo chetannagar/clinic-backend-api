@@ -48,4 +48,5 @@ class DoctorAvailability(models.Model):
         ordering = ['doctor', 'day_of_week', 'start_time']
 
     def __str__(self):
-        return f"{self.doctor.user.get_full_name()} - {self.day_of_week} ({self.start_time} to {self.end_time})"
+        full_name = f"{self.doctor.user.first_name} {self.doctor.user.last_name}".strip()
+        return f"{full_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
