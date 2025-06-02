@@ -5,6 +5,7 @@ import factory
 from appointments.models import Appointment
 from patients.factories import PatientFactory
 from doctors.factories import DoctorFactory
+from users.factories import UserFactory
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):
@@ -16,8 +17,8 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
         model = Appointment
 
     id = factory.LazyFunction(uuid.uuid4)
-    patient = factory.SubFactory(PatientFactory)
-    doctor = factory.SubFactory(DoctorFactory)
+    patient = factory.SubFactory(PatientFactory, user=factory.SubFactory(UserFactory, role="Patient"))
+    doctor = factory.SubFactory(DoctorFactory, user=factory.SubFactory(UserFactory, role="Doctor"))
     appointment_date = factory.Faker("future_date")
     appointment_time = factory.LazyFunction(
         lambda: datetime.time(

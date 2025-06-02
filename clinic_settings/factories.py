@@ -23,24 +23,8 @@ class ReviewFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Review
 
-    # Will ensure unique patient-doctor pair by tracking used pairs
-    _used_pairs = set()
-
-    @classmethod
-    def _generate(cls, strategy, params):
-        attempts = 0
-        while attempts < 10:
-            patient = PatientFactory()
-            doctor = DoctorFactory()
-            key = (patient.id, doctor.id)
-            if key not in cls._used_pairs:
-                cls._used_pairs.add(key)
-                params["patient"] = patient
-                params["doctor"] = doctor
-                break
-            attempts += 1
-        return super()._generate(strategy, params)
-
+    patient = factory.SubFactory(PatientFactory, user=factory.SubFactory(UserFactory, role="Patient"))
+    doctor = factory.SubFactory(DoctorFactory, user=factory.SubFactory(UserFactory, role="Doctor"))
     rating = factory.LazyFunction(lambda: random.randint(1, 5))
     review_text = factory.Faker("paragraph")
 

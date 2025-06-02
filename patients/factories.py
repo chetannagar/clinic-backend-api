@@ -1,7 +1,7 @@
 import factory
-import random
+# import random
 from patients.models import Patient
-from users.factories import UserFactory
+# from users.factories import UserFactory
 from faker import Faker
 
 fake = Faker('en_US')
@@ -11,7 +11,7 @@ class PatientFactory(factory.django.DjangoModelFactory):
         model = Patient
 
     # Ensure created user has role 'Patient'
-    user = factory.SubFactory(UserFactory, role='Patient')
+    user = None # factory.SubFactory(UserFactory, role='Patient')
     date_of_birth = factory.Faker('date_between', start_date='-80y', end_date='-18y')
     gender = factory.Iterator([
         Patient.GENDER_MALE,

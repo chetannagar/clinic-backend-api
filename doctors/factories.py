@@ -2,13 +2,13 @@ import datetime
 import factory
 import random
 from doctors.models import Doctor, DoctorAvailability
-from users.factories import UserFactory
+# from users.factories import UserFactory
 
 class DoctorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Doctor
 
-    user = factory.SubFactory(UserFactory, role='Doctor')  # Ensure the user is a doctor
+    user = None # factory.SubFactory(UserFactory, role='Doctor')  # Ensure the user is a doctor
     specialization = factory.Faker('job')
     qualifications = factory.Faker('text', max_nb_chars=200)  # Generate random qualifications
     experience = factory.LazyFunction(lambda: random.randint(1, 40))
