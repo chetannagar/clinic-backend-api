@@ -14,6 +14,8 @@ class MedicalReport(models.Model):
     report_type = models.CharField(max_length=50)
     file_url = models.URLField()
     diagnosis = models.TextField()
+    file_type = models.CharField(max_length=20, default='pdf')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -27,6 +29,7 @@ class Prescription(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     medications = models.JSONField()
     instructions = models.TextField()
+    issued_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

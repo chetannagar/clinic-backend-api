@@ -28,19 +28,33 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.patient.user.email} for {self.doctor.user.email}"
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name="review_rating_range"),
+        ]
 
 class AuditLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.TextField()
+    action_type = models.CharField(max_length=100, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.action
+
+    class Meta:
+        ordering = ["-timestamp"]
 
 
 class AdminActionLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.TextField()
+    action_type = models.CharField(max_length=100, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]

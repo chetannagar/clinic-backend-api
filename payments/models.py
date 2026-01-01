@@ -10,6 +10,7 @@ class Payment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10, default='AUD')
     PAYMENT_CREDIT_CARD = 'Credit Card'
     PAYMENT_DEBIT_CARD = 'Debit Card'
     PAYMENT_CASH = 'Cash'
@@ -31,19 +32,28 @@ class Payment(models.Model):
         (TRANSACTION_STATUS_FAILED, 'Failed'),
         (TRANSACTION_STATUS_REFUNDED, 'Refunded'),
     ]
-    transaction_status = models.CharField(max_length=20, choices=TRANSACTION_STATUS_CHOICES)
-    transaction_id = models.CharField(max_length=255)
+    transaction_status = models.CharField(max_length=20, choices=TRANSACTION_STATUS_CHOICES, default=TRANSACTION_STATUS_PENDING)
+    transaction_id = models.CharField(max_length=255, unique=True)
+    payment_metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Payment for {self.patient.user.email}"
     
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.CheckConstraint(check=models.Q(amount__gt=0), name='payment_amount_positive'),
+        ]
+    
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10, default='AUD')
+    invoice_number = models.CharField(max_length=50, unique=True)
     PAYMENT_STATUS_PAID = 'Paid'
     PAYMENT_STATUS_UNPAID = 'Unpaid'
     PAYMENT_STATUS_REFUNDED = 'Refunded'
@@ -52,10 +62,15 @@ class Invoice(models.Model):
         (PAYMENT_STATUS_UNPAID, 'Unpaid'),
         (PAYMENT_STATUS_REFUNDED, 'Refunded'),
     ]
-    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES)
-    invoice_pdf_url = models.URLField()
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_UNPAID)
+    invoice_pdf_url = models.URLField(blank=True)
+    issued_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Invoice for {self.patient.user.email}"
+
+    class Meta:
+        ordering = ['-issued_at']

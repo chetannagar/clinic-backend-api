@@ -23,12 +23,21 @@ class Notification(models.Model):
         (STATUS_FAILED, 'Failed'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    subject = models.CharField(max_length=255, blank=True)
+    message = models.TextField()
+    provider_message_id = models.CharField(max_length=255, blank=True)
+    error_message = models.TextField(blank=True)
+    is_read = models.BooleanField(default=False)
     sent_at = models.DateTimeField(blank=True, null=True)
+    read_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Notification to {self.user.email or 'Unknown'}"
+    
+    class Meta:
+        ordering = ['-created_at']
     
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
