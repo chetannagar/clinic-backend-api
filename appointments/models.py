@@ -42,7 +42,7 @@ class Appointment(models.Model):
                 name='unique_patient_appointment_slot'
             ),
             models.CheckConstraint(
-                check=models.Q(appointment_time__isnull=False),
+                condition=models.Q(appointment_time__isnull=False),
                 name='appointment_time_not_null'
             ),
         ]

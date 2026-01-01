@@ -44,7 +44,9 @@ class Payment(models.Model):
     class Meta:
         ordering = ['-created_at']
         constraints = [
-            models.CheckConstraint(check=models.Q(amount__gt=0), name='payment_amount_positive'),
+            models.CheckConstraint(
+                condition=models.Q(amount__gt=0), name='payment_amount_positive'
+            ),
         ]
     
 class Invoice(models.Model):

@@ -30,7 +30,9 @@ class Review(models.Model):
 
     class Meta:
         constraints = [
-            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name="review_rating_range"),
+            models.CheckConstraint(
+                condition=models.Q(rating__gte=1) & models.Q(rating__lte=5), name="review_rating_range"
+            ),
         ]
 
 class AuditLog(models.Model):

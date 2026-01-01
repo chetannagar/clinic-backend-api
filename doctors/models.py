@@ -53,7 +53,7 @@ class DoctorAvailability(models.Model):
         ordering = ["doctor", "day_of_week", "start_time"]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(end_time__gt=models.F("start_time")), name="availability_time_range_valid"
+                condition=models.Q(end_time__gt=models.F("start_time")), name="availability_time_range_valid"
             ),
             models.UniqueConstraint(
                 fields=["doctor", "day_of_week", "start_time", "end_time"], name="unique_doctor_availability_slot"
