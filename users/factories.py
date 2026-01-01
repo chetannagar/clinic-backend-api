@@ -25,6 +25,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             User.ROLE_STAFF,
         ]
     )
+    is_staff = factory.LazyAttribute(lambda obj: obj.role in [User.ROLE_STAFF, User.ROLE_ADMIN])
 
     @factory.post_generation
     def password(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
