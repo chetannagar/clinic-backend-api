@@ -1,7 +1,6 @@
 # myapp/management/commands/populate_db_master.py
 import random
 
-import factory
 from django.core.management.base import BaseCommand
 
 from appointments.factories import AppointmentFactory
@@ -20,9 +19,10 @@ from users.factories import UserFactory
 from users.models import User
 
 # Constants for batch sizes
-NUM_DOCTORS = 5
-NUM_PATIENTS = 10
-NUM_OTHER_USERS = 85
+DOCTORS_BATCH_SIZE = 5
+PATIENTS_BATCH_SIZE = 10
+ADMIN_BATCH_SIZE = 10
+STAFF_BATCH_SIZE = 75
 NUM_APPOINTMENTS = 20
 NUM_AVAILABILITIES = 2
 NUM_CLINIC_SETTINGS = 3
@@ -41,10 +41,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Create users by role
-        doctor_users = UserFactory.create_batch(NUM_DOCTORS, role=User.ROLE_DOCTOR)
-        patient_users = UserFactory.create_batch(NUM_PATIENTS, role=User.ROLE_PATIENT)
-        other_users = UserFactory.create_batch(NUM_OTHER_USERS)
-        users = doctor_users + patient_users + other_users
+        doctor_users = UserFactory.create_batch(DOCTORS_BATCH_SIZE, role=User.ROLE_DOCTOR)
+        patient_users = UserFactory.create_batch(PATIENTS_BATCH_SIZE, role=User.ROLE_PATIENT)
+        admin_users = UserFactory.create_batch(ADMIN_BATCH_SIZE, role=User.ROLE_ADMIN)
+        staff_users = UserFactory.create_batch(STAFF_BATCH_SIZE, role=User.ROLE_STAFF)
+        users = doctor_users + patient_users + admin_users + staff_users
 
         # Create patients and doctors using specific users
         patients = [PatientFactory(user=user) for user in patient_users]
@@ -60,10 +61,8 @@ class Command(BaseCommand):
         ]
 
         # Doctor availability
-        availability = [
+        for _ in range(NUM_AVAILABILITIES):
             DoctorAvailabilityFactory(doctor=random.choice(doctors))
-            for _ in range(NUM_AVAILABILITIES)
-        ]
 
         # Clinic settings
         clinic_settings = ClinicSettingFactory.create_batch(NUM_CLINIC_SETTINGS)
@@ -101,30 +100,29 @@ class Command(BaseCommand):
 
         # Payments
         for _ in range(NUM_PAYMENTS):
-            patient = random.choice(patients)
-            doctor = random.choice(doctors)
             appointment = random.choice(appointments)
-            PaymentFactory(patient=patient, doctor=doctor, appointment=appointment)
+            PaymentFactory(appointment=appointment)
 
         # Invoices
         for _ in range(NUM_INVOICES):
-            patient = random.choice(patients)
             appointment = random.choice(appointments)
-            InvoiceFactory(patient=patient, appointment=appointment)
+            InvoiceFactory(appointment=appointment)
 
         # Medical reports for first 10 appointments
         for appointment in appointments[:10]:
             MedicalReportFactory(
-                patient=random.choice(patients),
-                doctor=random.choice(doctors),
+                patient=appointment.patient,
+                doctor=appointment.doctor,
                 appointment=appointment
             )
 
         # Prescriptions
-        for _ in range(NUM_PRESCRIPTIONS):
-            patient = random.choice(patients)
-            doctor = random.choice(doctors)
-            PrescriptionFactory(patient=patient, doctor=doctor)
+        for appointment in appointments[:NUM_PRESCRIPTIONS]:
+            PrescriptionFactory(
+                appointment=appointment,
+                patient=appointment.patient,
+                doctor=appointment.doctor,
+            )
 
         # Final confirmation
         self.stdout.write(
