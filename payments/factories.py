@@ -41,6 +41,7 @@ class InvoiceFactory(factory.django.DjangoModelFactory):
     appointment = factory.SubFactory(AppointmentFactory)
     patient = factory.LazyAttribute(lambda o: o.appointment.patient if o.appointment else None)
     total_amount = factory.LazyFunction(lambda: round(random.uniform(50, 500), 2))
+    invoice_number = factory.Sequence(lambda n: f"INV-{n:06d}")
     payment_status = factory.Iterator(
         [
             Invoice.PAYMENT_STATUS_PAID,

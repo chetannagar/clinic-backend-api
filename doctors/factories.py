@@ -12,6 +12,7 @@ class DoctorFactory(factory.django.DjangoModelFactory):
         model = Doctor
 
     user = factory.SubFactory(UserFactory, role=User.ROLE_DOCTOR)
+    license_number = factory.Sequence(lambda n: f"LIC-{n:06d}")
     specialization = factory.Faker('job')
     qualifications = factory.Faker('text', max_nb_chars=200)
     experience = factory.LazyFunction(lambda: random.randint(1, 40))
