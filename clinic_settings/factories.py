@@ -2,7 +2,7 @@ import uuid
 import factory
 import random
 from django.utils import timezone
-from clinic_settings.models import ClinicSetting, Review, AuditLog, AdminActionLog
+from clinic_settings.models import AdminActionLog, AuditLog, ClinicSetting, Review
 from doctors.factories import DoctorFactory
 from patients.factories import PatientFactory
 from users.factories import UserFactory
@@ -15,7 +15,7 @@ class ClinicSettingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ClinicSetting
 
-    key = factory.Faker("word")
+    key = factory.Sequence(lambda n: f"setting_{n}")
     value = factory.Faker("sentence")
 
 
@@ -23,8 +23,8 @@ class ReviewFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Review
 
-    patient = factory.SubFactory(PatientFactory, user=factory.SubFactory(UserFactory, role="Patient"))
-    doctor = factory.SubFactory(DoctorFactory, user=factory.SubFactory(UserFactory, role="Doctor"))
+    patient = factory.SubFactory(PatientFactory)
+    doctor = factory.SubFactory(DoctorFactory)
     rating = factory.LazyFunction(lambda: random.randint(1, 5))
     review_text = factory.Faker("paragraph")
 

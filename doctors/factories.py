@@ -1,16 +1,19 @@
 import datetime
-import factory
 import random
+
+import factory
+
 from doctors.models import Doctor, DoctorAvailability
-# from users.factories import UserFactory
+from users.factories import UserFactory
+from users.models import User
 
 class DoctorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Doctor
 
-    user = None # factory.SubFactory(UserFactory, role='Doctor')  # Ensure the user is a doctor
+    user = factory.SubFactory(UserFactory, role=User.ROLE_DOCTOR)
     specialization = factory.Faker('job')
-    qualifications = factory.Faker('text', max_nb_chars=200)  # Generate random qualifications
+    qualifications = factory.Faker('text', max_nb_chars=200)
     experience = factory.LazyFunction(lambda: random.randint(1, 40))
     consultation_fee = factory.LazyFunction(lambda: round(random.uniform(50, 500), 2))
 
@@ -29,4 +32,4 @@ class DoctorAvailabilityFactory(factory.django.DjangoModelFactory):
     is_available = factory.LazyFunction(lambda: random.choice([True, False]))
 
     def __str__(self):
-        return f"{self.doctor.user.get_full_name()} - {self.day_of_week} ({self.start_time} to {self.end_time})"
+        return f"{self.doctor.user.full_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"

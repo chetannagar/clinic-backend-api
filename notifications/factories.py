@@ -15,17 +15,21 @@ class NotificationFactory(factory.django.DjangoModelFactory):
     appointment = factory.Maybe(
         factory.LazyFunction(lambda: random.choice([True, False])),
         yes_declaration=factory.SubFactory(AppointmentFactory),
-        no_declaration=None
+        no_declaration=None,
     )
-    type = factory.Iterator([
-        Notification.TYPE_SMS,
-        Notification.TYPE_EMAIL,
-    ])
-    status = factory.Iterator([
-        Notification.STATUS_PENDING,
-        Notification.STATUS_SENT,
-        Notification.STATUS_FAILED,
-    ])
+    type = factory.Iterator(
+        [
+            Notification.TYPE_SMS,
+            Notification.TYPE_EMAIL,
+        ]
+    )
+    status = factory.Iterator(
+        [
+            Notification.STATUS_PENDING,
+            Notification.STATUS_SENT,
+            Notification.STATUS_FAILED,
+        ]
+    )
     sent_at = factory.LazyFunction(lambda: timezone.now() if random.random() < 0.5 else None)
 
 
@@ -34,12 +38,20 @@ class MessageFactory(factory.django.DjangoModelFactory):
         model = Message
 
     sender = factory.SubFactory(UserFactory)
-    receiver = factory.SubFactory(UserFactory)
-    content = factory.Faker('paragraph')
+    content = factory.Faker("paragraph")
     is_read = factory.LazyFunction(lambda: random.choice([True, False]))
+
+    @factory.lazy_attribute
+    def receiver(self):
+        # Ensure sender and receiver are different users to mimic real conversations.
+        receiver = UserFactory()
+        if receiver == self.sender:
+            receiver = UserFactory()
+        return receiver
 
     @factory.lazy_attribute
     def read_at(self):
         if self.is_read:
             return timezone.now()
         return None
+    

@@ -1,11 +1,11 @@
 import datetime
 import random
 import uuid
+
 import factory
+
 from appointments.models import Appointment
 from patients.factories import PatientFactory
-from doctors.factories import DoctorFactory
-from users.factories import UserFactory
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):
@@ -17,12 +17,11 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
         model = Appointment
 
     id = factory.LazyFunction(uuid.uuid4)
-    patient = factory.SubFactory(PatientFactory, user=factory.SubFactory(UserFactory, role="Patient"))
-    doctor = factory.SubFactory(DoctorFactory, user=factory.SubFactory(UserFactory, role="Doctor"))
-    appointment_date = factory.Faker("future_date")
-    appointment_time = factory.LazyFunction(
-        lambda: datetime.time(
-            hour=random.randint(8, 16), minute=random.choice([0, 15, 30, 45])
+    patient = factory.SubFactory(PatientFactory)
+    appointment_date = factory.Sequence(lambda n: datetime.date.today() + datetime.timedelta(days=n))
+    appointment_time = factory.Sequence(
+        lambda n: datetime.time(
+            hour=9 + (n % 8), minute=random.choice([0, 15, 30, 45])
         )
     )
     status = factory.Iterator(
@@ -31,11 +30,21 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
             Appointment.STATUS_COMPLETED,
             Appointment.STATUS_CANCELED,
             Appointment.STATUS_RESCHEDULED,
+            Appointment.STATUS_NO_SHOW,
         ]
     )
     reason = factory.Faker("sentence")
     notes = factory.Faker("text")
-    # No need to define created_at and updated_at as they use auto_now_add and auto_now
+    
+    @factory.lazy_attribute
+    def doctor(self):
+        # Reuse the doctor associated with the patient's user if available; otherwise create one.
+        patient_doctor = getattr(self.patient.user, "doctor", None)
+        if patient_doctor:
+            return patient_doctor
+        from doctors.factories import DoctorFactory  # Inline import to avoid circular dependency
+
+        return DoctorFactory()
 
     @factory.post_generation
     def notes_optional(self, create, extracted, **kwargs):
