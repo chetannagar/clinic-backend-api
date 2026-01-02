@@ -2,7 +2,7 @@
 URL configuration for clinic project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -21,11 +21,15 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/appointments/", include("appointments.urls")),
+    path("api/auth/", include("users.auth_urls")),
     path("api/notifications/", include("notifications.urls")),
     path("api/patients/", include("patients.urls")),
     path("api/payments/", include("payments.urls")),
+    path("api/invoices/", include("payments.invoice_urls")),
     path("api/reports/", include("reports.urls")),
     path("api/settings/", include("clinic_settings.urls")),
+    path("api/audit-logs/", include("clinic_settings.audit_urls")),
     path("api/staff/", include("doctors.urls")),
+    path("api/doctors/", include("doctors.urls")),
     path("api/users/", include("users.urls")),
 ]

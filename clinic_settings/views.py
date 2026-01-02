@@ -1,5 +1,6 @@
-from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from clinic_settings.models import ClinicSetting, Review, AuditLog, AdminActionLog
 from clinic_settings.serializers import ClinicSettingSerializer, ReviewSerializer, AuditLogSerializer, AdminActionLogSerializer
 
@@ -18,3 +19,15 @@ class AuditLogViewSet(viewsets.ModelViewSet):
 class AdminActionLogViewSet(viewsets.ModelViewSet):
     queryset = AdminActionLog.objects.all()
     serializer_class = AdminActionLogSerializer
+
+
+class AuditLogListView(ListAPIView):
+    queryset = AuditLog.objects.all()
+    serializer_class = AuditLogSerializer
+    permission_classes = [IsAdminUser]
+
+
+class AuditLogDetailView(RetrieveAPIView):
+    queryset = AuditLog.objects.all()
+    serializer_class = AuditLogSerializer
+    permission_classes = [IsAdminUser]

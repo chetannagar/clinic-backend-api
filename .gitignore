@@ -30,6 +30,7 @@ db.sqlite3
 media/
 static/
 .env
+.env.local
 
 # Environments
 .venv/
